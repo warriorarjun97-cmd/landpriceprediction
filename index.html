@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KMIT Library: Book Reservations</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header class="topbar">
+    <h1>KMIT Library</h1>
+    <input id="searchBox" type="text" placeholder="Search title or author (press /)">
+    <label class="switch">
+      <input type="checkbox" id="closedToggle">
+      Library closed
+    </label>
+  </header>
+
+  <!-- Test controls: they change how the given server simulator behaves -->
+  <div class="testbar">
+    <b>Test controls:</b>
+    <label><input type="checkbox" id="failToggle"> Server error on book list</label>
+    <label><input type="checkbox" id="fastPrinter"> Fast printer</label>
+  </div>
+
+  <main class="layout">
+
+    <!-- ================= BOOKS ================= -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Books</h2>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+
+      <div id="tabs" class="tabs">
+        <button class="tab selected" data-cat="All">All</button>
+        <button class="tab" data-cat="Programming">Programming</button>
+        <button class="tab" data-cat="Mathematics">Mathematics</button>
+        <button class="tab" data-cat="Electronics">Electronics</button>
+      </div>
+
+      <p id="status" class="status"></p>
+      <div id="books" class="books"></div>
+      <p id="resultCount" class="muted"></p>
+    </section>
+
+    <!-- ================= RIGHT COLUMN ================= -->
+    <div class="column">
+
+      <section id="details" class="panel hidden">
+        <h2 id="detailTitle"></h2>
+        <p id="detailAuthor" class="muted"></p>
+        <p id="detailSummary"></p>
+        <p id="detailCopies"></p>
+        <p id="detailMsg" class="muted"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Reserve a book</h2>
+        <p>Selected book: <b id="selectedBook">none</b></p>
+
+        <form id="reserveForm" novalidate>
+          <div class="field">
+            <label for="studentName">Your name</label>
+            <input id="studentName" type="text">
+          </div>
+          <div class="field">
+            <label for="rollNo">Roll number</label>
+            <input id="rollNo" type="text">
+          </div>
+          <button id="reserveBtn" class="primary">Reserve</button>
+        </form>
+        <p id="formMsg" class="status"></p>
+
+        <h3>My reservations</h3>
+        <p id="noReservations" class="muted">You have no reservations.</p>
+        <ul id="reservations" class="reservations"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Library desk</h2>
+        <button id="statusBtn">Check library status</button>
+        <p id="libStatus"></p>
+        <p id="libHours"></p>
+        <p id="statusTime" class="muted"></p>
+
+        <button id="printBtn">Print reservation slip</button>
+        <p id="printMsg" class="status"></p>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Exam: Event Handling and Asynchronous JavaScript</title>
+<style>
+  :root { --bg: #ffffff; --ink: #1f1c18; --muted: #5f594f; --line: #d6d0c4; --soft: #f5f3ee; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #16141a; --ink: #e9e4dc; --muted: #a39b90; --line: #39343d; --soft: #211e25; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15.5px/1.55 "Segoe UI", system-ui, sans-serif; }
+  .paper { max-width: 900px; margin: 0 auto; padding: 28px 24px 60px; }
+  .head { text-align: center; border-bottom: 2px solid var(--ink); padding-bottom: 12px; }
+  .head h1 { font-size: 1.25rem; margin: 0; letter-spacing: 0.4px; }
+  .head p { margin: 2px 0; }
+  .meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 600; margin-top: 8px; }
+  .student { display: flex; gap: 30px; flex-wrap: wrap; margin: 14px 0; }
+  .student span { flex: 1; min-width: 220px; border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+  h2 { font-size: 1.1rem; margin: 30px 0 8px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+  .q { margin: 22px 0; padding-bottom: 18px; border-bottom: 1px dashed var(--line); }
+  .q-title { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; font-size: 1.02rem; }
+  .q ol, .q ul, .paper > ol { margin: 6px 0; padding-left: 24px; }
+  li { margin-bottom: 4px; }
+  .mk { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: 0.9em; background: var(--soft); padding: 0 4px; border-radius: 3px; }
+  pre { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow-x: auto; font-size: 0.88rem; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+  th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  kbd { font-family: Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 4px; padding: 0 6px; background: var(--soft); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .pair { grid-template-columns: 1fr; } }
+
+  /* ---------- Mock-up "screenshots" (always light, like a screenshot) ---------- */
+  .shot { margin: 12px 0 4px; }
+  .shot-cap { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  .mock { color: #23201b; background: #f1efe9; border: 1px solid #c9c2b4; border-radius: 8px; padding: 12px; font-size: 13.5px; line-height: 1.4; }
+  .mock .bar { background: #5b2a3a; color: #fff; padding: 8px 12px; border-radius: 6px 6px 0 0; margin: -12px -12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .mock .bar b { margin-right: auto; font-family: Georgia, serif; font-weight: normal; font-size: 15px; }
+  .mock .test { background: #f8f6f1; border-bottom: 1px dashed #d9d3c7; margin: 0 -12px 10px; padding: 4px 12px; font-size: 12px; color: #6a645a; }
+  .mock .pnl { background: #fff; border: 1px solid #d9d3c7; border-radius: 6px; padding: 10px; }
+  .mock .two { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; align-items: start; }
+  .mock .stack { display: grid; gap: 10px; }
+  .mock .btn { display: inline-block; border: 1px solid #d9d3c7; border-radius: 5px; padding: 2px 9px; background: #fff; margin: 2px 4px 2px 0; color: #23201b; }
+  .mock .btn.pri { background: #5b2a3a; color: #fff; border-color: #5b2a3a; }
+  .mock .btn.sel { background: #c9822b; color: #fff; border-color: #c9822b; font-weight: 600; }
+  .mock .btn.dis { opacity: 0.45; }
+  .mock .inp { border: 1px solid #d9d3c7; border-radius: 5px; padding: 3px 8px; background: #fff; min-height: 26px; color: #23201b; }
+  .mock .bar .inp { min-width: 190px; }
+  .mock .inp.bad { border-color: #b3261e; background: #fdecea; }
+  .mock .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mock .card { background: #f8f6f1; border: 1px solid #d9d3c7; border-radius: 6px; padding: 7px 8px; }
+  .mock .card.sel { border: 2px solid #c9822b; background: #fbf0dc; }
+  .mock .card .tag { font-size: 11px; color: #6a645a; border: 1px solid #d9d3c7; border-radius: 8px; padding: 0 6px; background: #fff; }
+  .mock .card b { display: block; margin-top: 3px; }
+  .mock .card i { font-style: normal; color: #6a645a; font-size: 12px; display: block; }
+  .mock .card .cp { font-weight: 600; font-size: 12.5px; margin-top: 2px; display: block; }
+  .mock .card.na .cp { color: #b3261e; }
+  .mock .dim { opacity: 0.4; filter: grayscale(1); }
+  .mock .err { color: #b3261e; font-weight: 600; }
+  .mock .ok { color: #1d7a45; font-weight: 600; }
+  .mock .muted { color: #6a645a; }
+  .mock .fld { padding: 4px 6px; border-radius: 5px; margin-bottom: 4px; }
+  .mock .fld.act { background: #fbf0dc; }
+  .mock .fld label { display: block; font-weight: 600; font-size: 12.5px; }
+  .mock .li { border-bottom: 1px solid #d9d3c7; padding: 4px 8px; display: flex; justify-content: space-between; align-items: center; }
+  .mock .li .x { color: #b3261e; border: 1px solid #d9d3c7; border-radius: 5px; padding: 0 8px; background: #fff; }
+  .mock .hl { outline: 3px solid #d0342c; outline-offset: 2px; border-radius: 4px; }
+  .mock .note { display: inline-block; background: #d0342c; color: #fff; font-size: 11.5px; font-weight: 600; border-radius: 4px; padding: 1px 6px; }
+  .mock .id { font-family: Consolas, monospace; font-size: 11px; color: #5b2a3a; background: #f0e2e6; border-radius: 3px; padding: 0 4px; }
+  .mock .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 4px 0; }
+  .mock h4 { margin: 0 0 6px; font-size: 14px; }
+
+  @media print { body { font-size: 13px; } .paper { padding: 0; } .q { break-inside: avoid-page; } }
+</style>
+</head>
+<body>
+<div class="paper">
+
+  <div class="head">
+    <h1>KESHAV MEMORIAL INSTITUTE OF TECHNOLOGY</h1>
+    <p>Laboratory Examination: Event Handling and Asynchronous JavaScript</p>
+    <div class="meta"><span>Time: 2 hours 30 minutes</span><span>Maximum marks: 50</span></div>
+  </div>
+
+  <div class="student">
+    <span>Name:</span>
+    <span>Roll number:</span>
+  </div>
+
+  <h2>Instructions</h2>
+  <ol>
+    <li>You are given <code>index.html</code>, <code>style.css</code> and <code>script.js</code>. Write all your code in <code>script.js</code>, <b>below</b> the given code. Do not change <code>index.html</code>, <code>style.css</code> or the given code.</li>
+    <li>There is no real server. <code>script.js</code> contains a given function, <code>libraryFetch(url, options)</code>, that behaves exactly like <code>fetch</code>: it returns a promise of a response with <code>res.ok</code>, <code>res.status</code> and <code>res.json()</code>, and it answers after a delay. Its comment lists every address it understands. Use it wherever you would use <code>fetch</code>.</li>
+    <li>The <b>Test controls</b> bar changes how the server behaves, so you can test errors and timeouts.</li>
+    <li>To change how something looks, add or remove these classes: <code>book-card</code>, <code>unavailable</code>, <code>selected</code>, <code>hidden</code>, <code>loading</code>, <code>disabled</code>, <code>error</code>, <code>success</code>, <code>active-field</code>.</li>
+    <li>Use <code>addEventListener</code> for every listener. Use <code>async</code>/<code>await</code> with <code>try</code>/<code>catch</code> for every request.</li>
+    <li>Use the exact function names, messages and formats given. Messages are shown in <i>italics</i>.</li>
+    <li>The browser Console (F12) must show no errors. A question whose code causes a Console error earns at most half its marks.</li>
+    <li>The pictures are drawings of the expected result. A <span style="outline:3px solid #d0342c;padding:0 4px;border-radius:3px">red outline</span> marks the part the question changes; it is not part of the page.</li>
+    <li>Questions build on each other: answer them in order. Part B is answered as comments at the end of <code>script.js</code>.</li>
+  </ol>
+
+  <h2>The page</h2>
+  <p>Students search the library's books, read a book's details, reserve copies and print a reservation slip. The ids you need are labelled.</p>
+  <div class="shot">
+    <div class="mock">
+      <div class="bar"><b>KMIT Library</b><span class="inp">Search title or author (press /)</span><span class="id">#searchBox</span> &#9744; Library closed <span class="id">#closedToggle</span></div>
+      <div class="test"><b>Test controls:</b> &#9744; Server error on book list <span class="id">#failToggle</span> &nbsp; &#9744; Fast printer <span class="id">#fastPrinter</span></div>
+      <div class="two">
+        <div class="pnl">
+          <div class="row"><b>Books</b><span style="margin-left:auto" class="btn">Refresh</span><span class="id">#refreshBtn</span></div>
+          <div class="row"><span class="btn sel">All</span><span class="btn">Programming</span><span class="btn">Mathematics</span><span class="btn">Electronics</span><span class="id">.tab</span></div>
+          <div class="muted">(messages) <span class="id">#status</span></div>
+          <div class="muted" style="padding:14px 0;text-align:center;border:1px dashed #d9d3c7;border-radius:6px;margin:6px 0">your book cards go here <span class="id">#books</span></div>
+          <div class="muted">(e.g. 8 books found) <span class="id">#resultCount</span></div>
+        </div>
+        <div class="stack">
+          <div class="pnl">
+            <div class="muted">Hidden until a book is clicked: <span class="id">#details</span></div>
+            <div class="muted" style="font-size:12px"><span class="id">#detailTitle</span> <span class="id">#detailAuthor</span> <span class="id">#detailSummary</span> <span class="id">#detailCopies</span> <span class="id">#detailMsg</span></div>
+          </div>
+          <div class="pnl">
+            <h4>Reserve a book</h4>
+            <div>Selected book: <b>none</b> <span class="id">#selectedBook</span></div>
+            <div class="fld"><label>Your name <span class="id">#studentName</span></label><div class="inp"></div></div>
+            <div class="fld"><label>Roll number <span class="id">#rollNo</span></label><div class="inp"></div></div>
+            <div class="row"><span class="btn pri">Reserve</span><span class="id">#reserveBtn</span> <span class="id">#reserveForm</span></div>
+            <div class="muted">(messages) <span class="id">#formMsg</span></div>
+            <div><b>My reservations</b> <span class="id">#reservations</span></div>
+            <div class="muted">You have no reservations. <span class="id">#noReservations</span></div>
+          </div>
+          <div class="pnl">
+            <h4>Library desk</h4>
+            <div class="row"><span class="btn">Check library status</span><span class="id">#statusBtn</span></div>
+            <div class="muted"><span class="id">#libStatus</span> <span class="id">#libHours</span> <span class="id">#statusTime</span></div>
+            <div class="row"><span class="btn">Print reservation slip</span><span class="id">#printBtn</span></div>
+            <div class="muted"><span class="id">#printMsg</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shot-cap">The page when it opens, before your code runs. Each form field is wrapped in a <code>.field</code>.</div>
+  </div>
+
+  <h2>Part A: Programming (10 &times; 4 = 40 marks)</h2>
+
+  <!-- Q1 -->
+  <div class="q">
+    <div class="q-title"><span>Q1. A helper for every request</span><span class="mk">[4 marks]</span></div>
+    <p>Write <code>async function requestJSON(url, options)</code>. Every later question uses it instead of calling <code>libraryFetch</code> directly.</p>
+    <ol type="a">
+      <li>It calls <code>libraryFetch(url, options)</code> and, for a successful response (2xx), returns the body as an object. <span class="mk">[1]</span></li>
+      <li>For a <code>204</code> response, it returns <code>null</code> without reading the body (a 204 has no body, and <code>res.json()</code> would fail). <span class="mk">[1]</span></li>
+      <li>For any other status, it throws an <code>Error</code> whose message is the server's <code>error</code> text, and sets the error's <code>status</code> property to the status code. <span class="mk">[2]</span></li>
+    </ol>
+    <table>
+      <tr><th>Call</th><th>Result</th></tr>
+      <tr><td><code>await requestJSON("/api/books/2")</code></td><td>returns <code>{ id: 2, title: "Head First Java", ... }</code></td></tr>
+      <tr><td><code>await requestJSON("/api/books/99")</code></td><td>throws an Error with message <i>No book with id 99</i> and <code>status</code> 404</td></tr>
+      <tr><td><code>await requestJSON("/api/reservations/101", { method: "DELETE" })</code> (an existing reservation)</td><td>returns <code>null</code></td></tr>
+    </table>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q">
+    <div class="q-title"><span>Q2. Loading the book list</span><span class="mk">[4 marks]</span></div>
+    <p>Write <code>async function loadBooks(search)</code>. It loads <code>GET /api/books</code>, or <code>GET /api/books?search=...</code> when <code>search</code> is not empty. Call it when the page opens (with an empty search) and when <code>#refreshBtn</code> is clicked (with the search box's text).</p>
+    <ol type="a">
+      <li>While the request is running: <code>#status</code> shows <i>Loading books...</i>, <code>#books</code> has the class <code>loading</code>, and <code>#refreshBtn</code> is disabled. All three are undone afterwards, whether the request succeeded or failed. <span class="mk">[1]</span></li>
+      <li>Replace the contents of <code>#books</code> with one card per book, built with <code>createElement</code> in exactly this structure. A book with 0 copies shows <i>Not available</i> instead, and its card also gets the class <code>unavailable</code>. <span class="mk">[1]</span>
+<pre><code>&lt;div class="book-card" data-id="1" data-category="Programming"&gt;
+  &lt;span class="cat"&gt;Programming&lt;/span&gt;
+  &lt;h3 class="book-title"&gt;Let Us C&lt;/h3&gt;
+  &lt;p class="book-author"&gt;Yashavant Kanetkar&lt;/p&gt;
+  &lt;p class="book-copies"&gt;Copies left: 2&lt;/p&gt;
+&lt;/div&gt;</code></pre></li>
+      <li><code>#resultCount</code> shows how many cards are visible: <i>8 books found</i>, <i>1 book found</i> or <i>No books found</i>. <span class="mk">[1]</span></li>
+      <li>If the request fails (tick <b>Server error on book list</b> and click Refresh), remove all cards, empty <code>#resultCount</code>, and show <i>Could not load books: &lt;server's message&gt; (&lt;status&gt;)</i> in <code>#status</code> with the class <code>error</code>. <span class="mk">[1]</span></li>
+    </ol>
+    <div class="pair">
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div class="grid hl">
+            <div class="card"><span class="tag">Programming</span><b>Let Us C</b><i>Yashavant Kanetkar</i><span class="cp">Copies left: 2</span></div>
+            <div class="card"><span class="tag">Programming</span><b>Head First Java</b><i>Kathy Sierra</i><span class="cp">Copies left: 1</span></div>
+            <div class="card na"><span class="tag">Programming</span><b>Python Crash Course</b><i>Eric Matthes</i><span class="cp">Not available</span></div>
+          </div>
+          <div class="muted" style="margin-top:4px">... 8 cards in total</div>
+          <div class="muted hl" style="display:inline-block;margin-top:4px">8 books found</div>
+        </div></div>
+        <div class="shot-cap">(b), (c) After the list has loaded.</div>
+      </div>
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div class="row"><b>Books</b><span style="margin-left:auto" class="btn">Refresh</span></div>
+          <div class="err hl">Could not load books: The library server is down (500)</div>
+          <div class="muted" style="padding:14px 0;text-align:center">(no cards)</div>
+        </div></div>
+        <div class="shot-cap">(d) Refresh with "Server error on book list" ticked.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q">
+    <div class="q-title"><span>Q3. Book details: the latest click wins</span><span class="mk">[4 marks]</span></div>
+    <ol type="a">
+      <li>Attach <b>one</b> click listener to <code>#books</code>, a named function <code>handleBookClick</code>. A click anywhere on a card selects that book; a click on a gap does nothing. <span class="mk">[1]</span></li>
+      <li>On a click, straight away: give the clicked card the class <code>selected</code> (and remove it from the others), show the title in <code>#selectedBook</code>, show <code>#details</code> (remove <code>hidden</code>), put the title in <code>#detailTitle</code>, empty the other detail lines, and show <i>Loading details...</i> in <code>#detailMsg</code>. <span class="mk">[1]</span></li>
+      <li>Then request <code>GET /api/books/:id</code> and show <i>by &lt;author&gt;</i> in <code>#detailAuthor</code>, the summary in <code>#detailSummary</code>, <i>Copies available: &lt;n&gt;</i> in <code>#detailCopies</code>, and empty <code>#detailMsg</code>. <span class="mk">[1]</span></li>
+      <li>Some books answer slowly. Click <b>Head First Java</b> (1.5 s) and then, at once, <b>Python Crash Course</b> (0.3 s). The panel must end up showing Python Crash Course. An answer that arrives after a newer click must be ignored. <span class="mk">[1]</span></li>
+    </ol>
+    <div class="shot">
+      <div class="mock"><div class="two">
+        <div class="pnl"><div class="grid" style="grid-template-columns:1fr 1fr">
+          <div class="card"><span class="tag">Programming</span><b>Head First Java</b><i>Kathy Sierra</i><span class="cp">Copies left: 1</span></div>
+          <div class="card na sel hl"><span class="tag">Programming</span><b>Python Crash Course</b><i>Eric Matthes</i><span class="cp">Not available</span></div>
+        </div></div>
+        <div class="pnl hl">
+          <h4>Python Crash Course</h4>
+          <div class="muted">by Eric Matthes</div>
+          <div>A hands-on introduction to Python through small projects.</div>
+          <div>Copies available: 0</div>
+        </div>
+      </div></div>
+      <div class="shot-cap">Head First Java clicked, then Python Crash Course: the later click wins, even though Head First Java's answer arrives last.</div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q">
+    <div class="q-title"><span>Q4. Search while typing</span><span class="mk">[4 marks]</span></div>
+    <p>Listen to the <code>input</code> event of <code>#searchBox</code>.</p>
+    <ol type="a">
+      <li>Do not send a request for every key. Send one only when the user has stopped typing for <b>400 ms</b>: each new keystroke cancels the previous wait (<code>setTimeout</code>, <code>clearTimeout</code>). Typing <i>java</i> quickly must send exactly <b>one</b> request. <span class="mk">[2]</span></li>
+      <li>The request is <code>loadBooks(text)</code> from Q2, with the trimmed text; the address must use <code>encodeURIComponent</code>. An empty box shows all books again. <span class="mk">[2]</span></li>
+    </ol>
+    <div class="shot">
+      <div class="mock">
+        <div class="bar"><b>KMIT Library</b><span class="inp hl">java</span> &#9744; Library closed</div>
+        <div class="pnl" style="margin-top:10px">
+          <div class="grid hl"><div class="card"><span class="tag">Programming</span><b>Head First Java</b><i>Kathy Sierra</i><span class="cp">Copies left: 1</span></div></div>
+          <div class="muted hl" style="display:inline-block;margin-top:6px">1 book found</div>
+        </div>
+      </div>
+      <div class="shot-cap">400 ms after typing "java". Only one search request was sent (check with a <code>console.log</code> inside <code>loadBooks</code>).</div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q">
+    <div class="q-title"><span>Q5. Reserving a book</span><span class="mk">[4 marks]</span></div>
+    <p>Handle the <code>submit</code> event of <code>#reserveForm</code>, and stop the page from reloading.</p>
+    <ol type="a">
+      <li>If no book has been selected (Q3), show <i>Choose a book first.</i> in <code>#formMsg</code> with the class <code>error</code>, and send no request. <span class="mk">[1]</span></li>
+      <li>While the request runs, disable <code>#reserveBtn</code> and show <i>Reserving...</i>. Enable it again afterwards (unless the library is closed, Q10). <span class="mk">[1]</span></li>
+      <li>Send <code>POST /api/reservations</code> with a JSON body <code>{ bookId, name, rollNo }</code> and the header <code>Content-Type: application/json</code>. Do <b>not</b> check the fields yourself: if the server refuses (400, 404 or 409), show its message in <code>#formMsg</code> with the class <code>error</code>, for example <i>Roll number must be 10 characters</i> or <i>No copies left of Head First Java</i>. <span class="mk">[1]</span></li>
+      <li>On <code>201</code>: show <i>Reserved &lt;title&gt;. Ready by &lt;readyBy&gt;.</i> with the class <code>success</code>, add the reservation to My reservations (Q6), empty the form, and reload the book list with the current search text, so the copies are up to date. <span class="mk">[1]</span></li>
+    </ol>
+    <div class="pair">
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div>Selected book: <b>Head First Java</b></div>
+          <div class="fld"><label>Your name</label><div class="inp">Asha</div></div>
+          <div class="fld"><label>Roll number</label><div class="inp">23BD1A05</div></div>
+          <div class="row"><span class="btn pri">Reserve</span></div>
+          <div class="err hl">Roll number must be 10 characters</div>
+        </div></div>
+        <div class="shot-cap">(c) The server refused a short roll number.</div>
+      </div>
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div>Selected book: <b>Head First Java</b></div>
+          <div class="fld"><label>Your name</label><div class="inp"></div></div>
+          <div class="fld"><label>Roll number</label><div class="inp"></div></div>
+          <div class="row"><span class="btn pri">Reserve</span></div>
+          <div class="ok hl">Reserved Head First Java. Ready by tomorrow, 10:00 AM.</div>
+          <div style="margin-top:10px"><b>My reservations</b></div>
+          <div class="li hl">Head First Java (#101) <span class="x">Cancel</span></div>
+        </div></div>
+        <div class="shot-cap">(d) Reserved with roll number 23BD1A0501. The form is empty again.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q">
+    <div class="q-title"><span>Q6. Cancelling a reservation</span><span class="mk">[4 marks]</span></div>
+    <ol type="a">
+      <li>Each reservation is an <code>&lt;li&gt;</code> in <code>#reservations</code> with the text <i>&lt;title&gt; (#&lt;id&gt;)</i>, a <code>data-id</code>, and a button <i>Cancel</i> with the class <code>cancel</code>. <code>#noReservations</code> is hidden whenever the list is not empty. <span class="mk">[1]</span></li>
+      <li>Use <b>one</b> click listener on <code>#reservations</code>; it must work for reservations added later. <span class="mk">[1]</span></li>
+      <li>A Cancel click asks <code>confirm("Cancel this reservation?")</code>. If confirmed, send <code>DELETE /api/reservations/:id</code>. On <code>204</code>, remove the item, show <i>Reservation #&lt;id&gt; cancelled.</i> in <code>#formMsg</code> with the class <code>success</code>, and reload the book list. <span class="mk">[2]</span></li>
+    </ol>
+    <div class="shot">
+      <div class="mock"><div class="pnl" style="max-width:420px">
+        <div class="ok hl">Reservation #101 cancelled.</div>
+        <b>My reservations</b>
+        <div class="muted hl" style="display:inline-block">You have no reservations.</div>
+      </div></div>
+      <div class="shot-cap">After cancelling the only reservation. Head First Java's card shows <i>Copies left: 1</i> again.</div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q">
+    <div class="q-title"><span>Q7. Library status: two requests at once</span><span class="mk">[4 marks]</span></div>
+    <p>When <code>#statusBtn</code> is clicked, request <code>GET /api/status/open</code> and <code>GET /api/status/hours</code>. Each takes about 0.7 seconds.</p>
+    <ol type="a">
+      <li>Send both <b>at the same time</b> with <code>Promise.all</code>, so the whole check takes about 0.7 s, not 1.4 s. <span class="mk">[2]</span></li>
+      <li>Show the <code>message</code> in <code>#libStatus</code> and <i>Hours: &lt;hours&gt;</i> in <code>#libHours</code>. Disable the button while waiting. <span class="mk">[1]</span></li>
+      <li>Measure the time with <code>Date.now()</code> and show <i>Loaded in &lt;seconds, 1 decimal&gt; seconds</i> in <code>#statusTime</code>. <span class="mk">[1]</span></li>
+    </ol>
+    <div class="shot">
+      <div class="mock"><div class="pnl" style="max-width:420px">
+        <h4>Library desk</h4>
+        <div class="row"><span class="btn">Check library status</span></div>
+        <div class="hl" style="padding:2px 4px">The library is open<br>Hours: 8:30 AM to 6:00 PM<br><span class="muted">Loaded in 0.7 seconds</span></div>
+      </div></div>
+      <div class="shot-cap">After clicking Check library status. A sequential version would say about 1.4 seconds.</div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q">
+    <div class="q-title"><span>Q8. Printing with a time limit</span><span class="mk">[4 marks]</span></div>
+    <p>The printer is slow: <code>POST /api/print</code> takes 3 seconds, or 1 second when <b>Fast printer</b> is ticked. The page must not wait more than 2 seconds.</p>
+    <ol type="a">
+      <li>If My reservations is empty, show <i>Make a reservation first.</i> in <code>#printMsg</code> with the class <code>error</code>, and send no request. <span class="mk">[1]</span></li>
+      <li>Write <code>timeLimit(ms)</code>: it returns a promise that rejects after <code>ms</code> milliseconds with the error <i>Printer is busy. Try again.</i> <span class="mk">[1]</span></li>
+      <li>Race the print request against <code>timeLimit(2000)</code> with <code>Promise.race</code>. Show the server's <i>Slip printed</i> with the class <code>success</code>, or the time-limit message with the class <code>error</code>. Disable <code>#printBtn</code> while waiting. <span class="mk">[2]</span></li>
+    </ol>
+    <div class="pair">
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div class="row"><span class="btn">Print reservation slip</span></div>
+          <div class="err hl">Printer is busy. Try again.</div>
+        </div></div>
+        <div class="shot-cap">Normal printer: after 2 seconds.</div>
+      </div>
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div class="row"><span class="btn">Print reservation slip</span></div>
+          <div class="ok hl">Slip printed</div>
+        </div></div>
+        <div class="shot-cap">Fast printer ticked: after 1 second.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q">
+    <div class="q-title"><span>Q9. Keyboard shortcuts and focus</span><span class="mk">[4 marks]</span></div>
+    <p>Use <b>one</b> <code>keydown</code> listener on <code>document</code>.</p>
+    <table>
+      <tr><th>Key</th><th>Action</th><th>Marks</th></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Works everywhere. If <code>#details</code> is showing, hide it. Otherwise, if the search box has text, empty it, cancel any waiting search (Q4), and show all books.</td><td>1</td></tr>
+      <tr><td><kbd>/</kbd></td><td>Puts the cursor in <code>#searchBox</code>. The <kbd>/</kbd> itself must not be typed into the box.</td><td>1</td></tr>
+      <tr><td><kbd>R</kbd></td><td>Reloads the book list with the current search text. Holding the key down reloads only once. <kbd>/</kbd> and <kbd>R</kbd> do nothing while the user is typing in an input.</td><td>1</td></tr>
+    </table>
+    <p>Also: when an input inside <code>#reserveForm</code> gets the cursor, give its <code>.field</code> the class <code>active-field</code>, and remove it when the cursor leaves. Use exactly one listener on the form for gaining focus and one for losing it. <span class="mk">[1]</span></p>
+    <div class="shot">
+      <div class="mock"><div class="pnl" style="max-width:420px">
+        <div class="fld"><label>Your name</label><div class="inp">Asha</div></div>
+        <div class="fld act hl"><label>Roll number</label><div class="inp">23BD|</div></div>
+      </div></div>
+      <div class="shot-cap">The cursor is in the roll number box.</div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q">
+    <div class="q-title"><span>Q10. Category tabs and closing the library</span><span class="mk">[4 marks]</span></div>
+    <ol type="a">
+      <li>Attach a click listener to each <code>.tab</code>, written with the <code>function</code> keyword, and use <code>this</code> to give the clicked tab the class <code>selected</code> (removing it from the others). Hide the cards whose <code>data-category</code> does not match with the class <code>hidden</code> (<i>All</i> shows every card), and update <code>#resultCount</code>. The chosen category must stay applied when the list is reloaded or searched. <span class="mk">[2]</span></li>
+      <li>When <code>#closedToggle</code> is ticked (<code>change</code> event): remove the Q3 listener with <code>removeEventListener</code>, add the class <code>disabled</code> to <code>#books</code>, disable <code>#reserveBtn</code>, and show <i>The library is closed.</i> in <code>#status</code> with the class <code>error</code>. When it is unticked, undo all of these. One click on a card must then send exactly <b>one</b> details request. <span class="mk">[2]</span></li>
+    </ol>
+    <div class="pair">
+      <div class="shot">
+        <div class="mock"><div class="pnl">
+          <div class="row"><span class="btn">All</span><span class="btn">Programming</span><span class="btn sel hl">Mathematics</span><span class="btn">Electronics</span></div>
+          <div class="grid hl" style="grid-template-columns:1fr 1fr">
+            <div class="card"><span class="tag">Mathematics</span><b>Higher Engineering Mathematics</b><i>B. S. Grewal</i><span class="cp">Copies left: 3</span></div>
+            <div class="card"><span class="tag">Mathematics</span><b>Discrete Mathematics</b><i>Kenneth Rosen</i><span class="cp">Copies left: 1</span></div>
+          </div>
+          <div class="muted" style="margin-top:4px">2 books found</div>
+        </div></div>
+        <div class="shot-cap">(a) The Mathematics tab.</div>
+      </div>
+      <div class="shot">
+        <div class="mock">
+          <div class="bar"><b>KMIT Library</b><span class="hl">&#9745; Library closed</span></div>
+          <div class="pnl" style="margin-top:10px">
+            <div class="err hl">The library is closed.</div>
+            <div class="grid dim hl" style="grid-template-columns:1fr 1fr">
+              <div class="card"><span class="tag">Programming</span><b>Let Us C</b><span class="cp">Copies left: 2</span></div>
+              <div class="card"><span class="tag">Programming</span><b>Head First Java</b><span class="cp">Copies left: 1</span></div>
+            </div>
+            <div class="row"><span class="btn pri dis hl">Reserve</span></div>
+          </div>
+        </div>
+        <div class="shot-cap">(b) Library closed: clicking a card does nothing.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Part B: Written answers (5 &times; 2 = 10 marks)</h2>
+  <p>Answer as comments at the end of <code>script.js</code>, in two to four lines each.</p>
+
+  <div class="q">
+    <div class="q-title"><span>B1.</span><span class="mk">[2 marks]</span></div>
+    <p>Write the four numbers in the order they are printed, and explain the order.</p>
+<pre><code>async function show() {
+  console.log(1);
+  await null;
+  console.log(3);
+}
+setTimeout(function () { console.log(2); }, 0);
+show();
+console.log(4);</code></pre>
+  </div>
+
+  <div class="q">
+    <div class="q-title"><span>B2.</span><span class="mk">[2 marks]</span></div>
+    <p>In Q3, what would the details panel show if you removed the "latest click wins" check and clicked Head First Java and then Python Crash Course? Explain why, using the delays, and how your check prevents it.</p>
+  </div>
+
+  <div class="q">
+    <div class="q-title"><span>B3.</span><span class="mk">[2 marks]</span></div>
+    <p>In Q4, how many requests are sent when a student quickly types <i>java</i>: without the 400 ms wait, and with it? Name one problem the extra requests can cause, apart from wasted work.</p>
+  </div>
+
+  <div class="q">
+    <div class="q-title"><span>B4.</span><span class="mk">[2 marks]</span></div>
+    <p>In Q7, about how long would the check take with two <code>await</code> lines one after the other, and how long with <code>Promise.all</code>? What does <code>Promise.all</code> do if one of the two requests fails?</p>
+  </div>
+
+  <div class="q">
+    <div class="q-title"><span>B5.</span><span class="mk">[2 marks]</span></div>
+    <p>In Q1, why must <code>requestJSON</code> check for <code>204</code> before calling <code>res.json()</code>? And why must it check <code>res.ok</code> itself, instead of relying on <code>catch</code> to notice a 404 or 409?</p>
+  </div>
+
+  <p style="text-align:center;margin-top:30px;font-weight:600">*** End of question paper ***</p>
+</div>
+</body>
+</html>
